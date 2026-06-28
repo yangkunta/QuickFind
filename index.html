@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>VaultOne - 安全密碼管理器</title>
+    <!-- Google Material Symbols Rounded -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- PWA Web App Manifest (Optional but enabled for mobile homescreen install) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- 1. Lock / Onboarding Screen -->
+        <div id="lock-screen" class="lock-screen">
+            <div class="lock-logo-area">
+                <div class="lock-logo">
+                    <span class="material-symbols-rounded">security</span>
+                </div>
+                <h2 id="lock-screen-title" class="lock-title">VaultOne</h2>
+                <p id="lock-screen-subtitle" class="lock-subtitle">您在三星 S26 上的安全保險箱</p>
+            </div>
+
+            <!-- Lock Interaction Area -->
+            <div class="lock-interactive-area">
+                <!-- A: Normal Lock State (Fingerprint) -->
+                <div id="lock-state-active" class="lock-interactive-area" style="display: none;">
+                    <div class="fingerprint-sensor" id="fingerprint-btn">
+                        <span class="material-symbols-rounded" style="font-size: 48px;">fingerprint</span>
+                    </div>
+                    <span class="password-fallback-link" id="pwd-fallback-btn">使用主密碼解鎖</span>
+                </div>
+
+                <!-- B: Password Input State (Fallback or Onboarding) -->
+                <div id="lock-state-input" class="lock-interactive-area" style="width: 100%;">
+                    <div class="form-group" style="width: 100%; max-width: 320px;">
+                        <div class="input-container">
+                            <input type="password" id="lock-password-input" placeholder="輸入主密碼">
+                            <button class="input-action" id="lock-pwd-toggle">
+                                <span class="material-symbols-rounded">visibility</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="lock-submit-btn" style="max-width: 320px;">解鎖保險箱</button>
+                    <span class="password-fallback-link" id="biometric-back-btn" style="display: none;">返回指紋辨識</span>
+                </div>
+            </div>
+
+            <div style="font-size: 11px; color: var(--text-muted);">
+                本地端加密 • 零知識架構
+            </div>
+        </div>
+
+        <!-- 2. Main App Content (Vault View) -->
+        <div id="main-vault-view" style="display: flex; flex-direction: column; flex: 1;">
+            
+            <!-- Collapsible Header -->
+            <div class="oneui-header">
+                <span class="subtitle">VaultOne 安全金庫</span>
+                <span class="title" id="page-title">保險箱</span>
+            </div>
+
+            <!-- Search Area -->
+            <div class="search-wrapper" id="search-container">
+                <form onsubmit="event.preventDefault(); document.getElementById('search-input').blur();" style="display: flex; gap: 8px; width: 100%;">
+                    <div class="search-bar" style="flex: 1; margin: 0;">
+                        <span class="material-symbols-rounded">search</span>
+                        <input type="search" id="search-input" placeholder="搜尋分類、備註..." autocomplete="off">
+                        <button type="button" class="input-action" id="search-clear-btn" style="display: none; background: none; border: none; color: var(--text-muted);">
+                            <span class="material-symbols-rounded">close</span>
+                        </button>
+                    </div>
+                    <button type="button" id="show-all-btn" style="padding: 0 16px; border-radius: 20px; border: none; background: rgba(62, 130, 252, 0.1); color: var(--accent-blue); font-weight: bold;">全部</button>
+                </form>
+            </div>
+
+
+            <!-- Vault Records Content -->
+            <div class="vault-content" id="vault-records-list">
+                <!-- Grouped card lists will be injected here by app.js -->
+            </div>
+
+            <!-- Floating Action Button (FAB) -->
+            <button class="fab" id="add-fab">
+                <span class="material-symbols-rounded">add</span>
+            </button>
+        </div>
+
+        <!-- 3. Settings View (Hidden by default) -->
+        <div id="main-settings-view" style="display: none; flex-direction: column; flex: 1;">
+            <div class="oneui-header">
+                <span class="subtitle">系統設定與同步</span>
+                <span class="title">設定</span>
+            </div>
+            
+            <div class="vault-content" style="padding-bottom: 80px;">
+                <!-- Google Drive Sync Section -->
+                <div class="settings-section-title">雲端同步 (Google Drive)</div>
+                <div class="card-group" style="padding: 8px 0;">
+                    <!-- Google Cloud Credentials -->
+                    <div style="padding: 12px 20px;">
+                        <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Google Cloud OAuth Client ID (留空使用模擬沙盒測試)</label>
+                        <div class="input-container">
+                            <input type="text" id="setting-client-id" placeholder="輸入您的 Client ID..." style="background-color: var(--bg-primary); padding: 10px 12px; font-size: 13px;">
+                        </div>
+                        <button class="btn-secondary" id="save-client-id-btn" style="margin-top: 10px; padding: 10px; font-size: 13px; border-radius: var(--border-radius-small);">儲存 Client ID</button>
+                    </div>
+                    
+                    <div class="list-item" id="btn-cloud-backup">
+                        <div class="item-left">
+                            <div class="item-icon" style="background-color: rgba(48, 209, 88, 0.1); color: var(--accent-green);">
+                                <span class="material-symbols-rounded">cloud_upload</span>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-title">備份到雲端硬碟</div>
+                                <div class="item-username" id="cloud-backup-info">未曾備份過</div>
+                            </div>
+                        </div>
+                        <span class="material-symbols-rounded" style="color: var(--text-muted);">chevron_right</span>
+                    </div>
+                    
+                    <div class="list-item" id="btn-cloud-restore">
+                        <div class="item-left">
+                            <div class="item-icon" style="background-color: rgba(255, 214, 10, 0.1); color: var(--accent-yellow);">
+                                <span class="material-symbols-rounded">cloud_download</span>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-title">從雲端硬碟還原</div>
+                                <div class="item-username">會覆蓋目前本地端資料</div>
+                            </div>
+                        </div>
+                        <span class="material-symbols-rounded" style="color: var(--text-muted);">chevron_right</span>
+                    </div>
+                </div>
+
+                <!-- Backup & Restore Section -->
+                <div class="settings-section-title">本地資料備份</div>
+                <div class="card-group">
+                    <div class="list-item" id="btn-local-export">
+                        <div class="item-left">
+                            <div class="item-icon">
+                                <span class="material-symbols-rounded">download</span>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-title">匯出加密檔案 (JSON)</div>
+                                <div class="item-username">在本地端儲存加密備份</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" style="position: relative; cursor: pointer;">
+                        <input type="file" id="local-import-file" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" accept=".json">
+                        <div class="item-left">
+                            <div class="item-icon">
+                                <span class="material-symbols-rounded">upload</span>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-title">匯入備份檔案 (JSON)</div>
+                                <div class="item-username">選擇並還原您的密碼檔</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" style="position: relative; cursor: pointer;">
+                        <input type="file" id="csv-import-file" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" accept=".csv">
+                        <div class="item-left">
+                            <div class="item-icon" style="background-color: rgba(62, 130, 252, 0.1); color: var(--accent-blue);">
+                                <span class="material-symbols-rounded">post_add</span>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-title">整批匯入 (CSV)</div>
+                                <div class="item-username">讀取 CSV 新增資料 (分類,備註,說明)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Section -->
+                <div class="settings-section-title">帳號安全</div>
+                <div class="card-group">
+                    <div class="list-item" id="btn-change-pwd">
+                        <div class="item-left">
+                            <div class="item-icon">
+                                <span class="material-symbols-rounded">key</span>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-title">變更主密碼</div>
+                                <div class="item-username">重新設定保險箱金鑰</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" id="btn-reset-vault">
+                        <div class="item-left">
+                            <div class="item-icon" style="background-color: rgba(255, 69, 58, 0.1); color: var(--accent-red);">
+                                <span class="material-symbols-rounded">delete_forever</span>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-title" style="color: var(--accent-red);">清除所有資料</div>
+                                <div class="item-username">重設 App 並刪除保險箱內容</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <div class="bottom-nav">
+            <div class="nav-tab active" id="tab-vault">
+                <span class="material-symbols-rounded">search</span>
+                <span>查詢</span>
+            </div>
+            <div class="nav-tab" id="tab-maint">
+                <span class="material-symbols-rounded">build</span>
+                <span>維護</span>
+            </div>
+            <div class="nav-tab" id="tab-settings">
+                <span class="material-symbols-rounded">settings</span>
+                <span>設定</span>
+            </div>
+        </div>
+
+        <!-- 4. BOTTOM SHEET MODALS -->
+        
+        <!-- Add / Edit Full-Screen Sheet -->
+        <div class="bottom-sheet-overlay" id="add-sheet-overlay">
+            <div class="bottom-sheet full-screen-sheet" id="add-sheet">
+                <div class="bottom-sheet-header" style="padding: 20px 24px; display: flex; justify-content: flex-start; align-items: center; gap: 16px; border-bottom: 1px solid var(--border-color);">
+                    <button class="close-sheet-btn" id="close-add-sheet" style="font-size: 22px; display: flex; align-items: center; padding: 4px; background: none; border: none; color: var(--text-primary); cursor: pointer;">
+                        <span class="material-symbols-rounded">arrow_back</span>
+                    </button>
+                    <h3 id="add-sheet-title" style="font-size: 20px; font-weight: 600; margin: 0;">新增保險箱紀錄</h3>
+                </div>
+                <div class="bottom-sheet-body" style="padding: 24px; overflow-y: auto;">
+                    <form id="add-record-form" onsubmit="return false;">
+                        <input type="hidden" id="record-id">
+                        
+                        <div class="form-group">
+                            <label for="record-category">分類 (請輸入類別)</label>
+                            <div class="input-container">
+                                <input type="text" id="record-category" placeholder="例如：個人、社群、銀行帳戶、備忘..." required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="record-notes">備註 (多行)</label>
+                            <div class="input-container">
+                                <textarea id="record-notes" placeholder="請輸入備註內容..." rows="4"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="record-description">說明 (多行)</label>
+                            <div class="input-container">
+                                <textarea id="record-description" placeholder="詳細說明..." rows="6"></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="save-record-btn" style="margin-top: 24px; margin-bottom: 40px;">儲存紀錄</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail View Sheet -->
+        <div class="bottom-sheet-overlay" id="detail-sheet-overlay">
+            <div class="bottom-sheet" id="detail-sheet">
+                <div class="bottom-sheet-handle"></div>
+                <div class="bottom-sheet-header">
+                    <h3>資料詳情</h3>
+                    <button class="close-sheet-btn" id="close-detail-sheet">&times;</button>
+                </div>
+                <div class="bottom-sheet-body">
+                    <div class="detail-header">
+                        <div class="detail-logo" id="detail-card-icon">
+                            <span class="material-symbols-rounded">vpn_key</span>
+                        </div>
+                        <div class="detail-title" id="detail-title">Google</div>
+                    </div>
+
+                    <div class="detail-label" style="margin-bottom: 8px; padding-left: 4px;">備註</div>
+                    <div class="detail-notes-box" id="detail-notes" style="margin-bottom: 16px;">無備註</div>
+
+                    <div class="detail-label" style="margin-bottom: 8px; padding-left: 4px;">說明</div>
+                    <div class="detail-notes-box" id="detail-description" style="min-height: 100px;">無說明</div>
+
+                    <div style="display: flex; gap: 12px; margin-top: 16px;">
+                        <button class="btn-secondary" id="detail-edit-btn" style="flex: 1;">編輯</button>
+                        <button class="btn-secondary" id="detail-delete-btn" style="flex: 1; color: var(--accent-red); border-color: rgba(255, 69, 58, 0.2);">刪除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Master Password Verification Dialog (for sensitive operations) -->
+        <div class="bottom-sheet-overlay" id="auth-prompt-overlay" style="z-index: 9999;">
+            <div class="bottom-sheet" id="auth-prompt-sheet" style="max-height: 50%;">
+                <div class="bottom-sheet-handle"></div>
+                <div class="bottom-sheet-header">
+                    <h3>身分驗證</h3>
+                    <button class="close-sheet-btn" id="close-auth-prompt">&times;</button>
+                </div>
+                <div class="bottom-sheet-body">
+                    <p style="font-size: 14px; color: var(--text-secondary); text-align: center; margin-bottom: 20px;" id="auth-prompt-msg">為確保安全性，請輸入您設定的主密碼：</p>
+                    <div class="form-group">
+                        <div class="input-container">
+                            <input type="password" id="auth-prompt-password" placeholder="主密碼">
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="auth-prompt-submit-btn">確認驗證</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSV Preview Dialog -->
+        <div class="bottom-sheet-overlay" id="csv-preview-overlay">
+            <div class="bottom-sheet" id="csv-preview-sheet" style="max-height: 85%;">
+                <div class="bottom-sheet-handle"></div>
+                <div class="bottom-sheet-header">
+                    <h3>CSV 匯入預覽</h3>
+                    <button class="close-sheet-btn" id="close-csv-preview">&times;</button>
+                </div>
+                <div class="bottom-sheet-body" style="padding-top: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px;">
+                        <span style="font-size: 13px; color: var(--text-secondary);" id="csv-preview-count">找到 0 筆資料</span>
+                        <button id="csv-select-all-btn" style="background:none; border:none; color:var(--accent-blue); font-size:13px; font-weight:500;">全選 / 取消</button>
+                    </div>
+                    <div id="csv-preview-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom: 20px;">
+                        <!-- Preview Items will be injected here -->
+                    </div>
+                    <button class="btn-primary" id="csv-import-submit-btn">確認匯入</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Toast Notification -->
+        <div class="toast" id="toast-msg">已複製到剪貼簿</div>
+
+    </div>
+
+    <!-- Application Script Files -->
+    <script src="crypto.js?v=3"></script>
+    <script src="gdrive.js?v=3"></script>
+    <script src="app.js?v=3"></script>
+</body>
+</html>
