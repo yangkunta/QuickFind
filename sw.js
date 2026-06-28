@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quickfind-v1';
+const CACHE_NAME = 'quickfind-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -32,8 +32,13 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
+    caches.match(event.request, {ignoreSearch: true}).then(response => {
+      return response || fetch(event.request).catch(() => {
+        // Fallback to cached index.html if offline and requesting a navigation
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      });
     })
   );
 });
