@@ -4,6 +4,44 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ==========================================
+    // PWA Service Worker Registration & Install
+    // ==========================================
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('SW registered:', reg))
+                .catch(err => console.log('SW registration failed:', err));
+        });
+    }
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        const btnInstallApp = document.getElementById('btn-install-app');
+        const installSectionTitle = document.getElementById('install-section-title');
+        const installSectionGroup = document.getElementById('install-section-group');
+        
+        if (btnInstallApp && installSectionTitle && installSectionGroup) {
+            installSectionTitle.style.display = 'block';
+            installSectionGroup.style.display = 'block';
+            
+            btnInstallApp.onclick = async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installSectionTitle.style.display = 'none';
+                        installSectionGroup.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                }
+            };
+        }
+    });
+
     // --- Application State ---
     let vaultRecords = [];
     let masterPassword = ''; // In-memory cache while app is unlocked
