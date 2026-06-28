@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quickfind-v2';
+const CACHE_NAME = 'quickfind-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -7,7 +7,8 @@ const ASSETS = [
   './crypto.js',
   './gdrive.js',
   './manifest.json',
-  'https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0'
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -31,14 +32,21 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // For HTML navigation requests (e.g. visiting the URL directly)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        // If offline, return the cached index.html
+        return caches.match('./index.html', {ignoreSearch: true});
+      })
+    );
+    return;
+  }
+
+  // For other requests (CSS, JS, images, etc.)
   event.respondWith(
     caches.match(event.request, {ignoreSearch: true}).then(response => {
-      return response || fetch(event.request).catch(() => {
-        // Fallback to cached index.html if offline and requesting a navigation
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
+      return response || fetch(event.request);
     })
   );
 });

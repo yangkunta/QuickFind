@@ -2,7 +2,7 @@
     "name": "QuickFind 安全金庫",
     "short_name": "QuickFind",
     "description": "極致簡化、高安全性的本地端私密筆記與密碼管理器",
-    "start_url": ".",
+    "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#000000",
     "theme_color": "#000000",
