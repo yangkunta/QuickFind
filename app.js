@@ -897,35 +897,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (csvImportSubmitBtn) {
-        csvImportSubmitBtn.onclick = () => {
+        csvImportSubmitBtn.onclick = async () => {
             const selectedData = csvPreviewData.filter(item => item.selected);
             if (selectedData.length === 0) {
                 showToast("請至少勾選一筆資料！");
                 return;
             }
 
-            verifyIdentity(`確定匯入選取的 ${selectedData.length} 筆資料？`, async () => {
-                selectedData.forEach(item => {
-                    vaultRecords.push({
-                        id: generateId(),
-                        category: item.category,
-                        notes: item.notes,
-                        description: item.description,
-                        updatedAt: new Date().toISOString()
-                    });
+            selectedData.forEach(item => {
+                vaultRecords.push({
+                    id: generateId(),
+                    category: item.category,
+                    notes: item.notes,
+                    description: item.description,
+                    updatedAt: new Date().toISOString()
                 });
-
-                try {
-                    await saveVaultToStorage(masterPassword);
-                    showToast(`成功匯入 ${selectedData.length} 筆資料！`);
-                    closeBottomSheet(csvPreviewOverlay, csvPreviewSheet);
-                    if (pageTitle.innerText === "查詢" || pageTitle.innerText === "維護") {
-                        renderRecords(searchInput.value);
-                    }
-                } catch (e) {
-                    showToast("儲存失敗！");
-                }
             });
+
+            try {
+                await saveVaultToStorage(masterPassword);
+                showToast(`成功匯入 ${selectedData.length} 筆資料！`);
+                closeBottomSheet(csvPreviewOverlay, csvPreviewSheet);
+                if (pageTitle.innerText === "查詢" || pageTitle.innerText === "維護") {
+                    renderRecords(searchInput.value);
+                }
+            } catch (e) {
+                showToast("儲存失敗！");
+            }
         };
     }
 

@@ -15,7 +15,11 @@ function bufferToString(buf) {
 
 // Helper: Convert ArrayBuffer to Base64
 function bufferToBase64(buf) {
-    const binString = String.fromCharCode(...new Uint8Array(buf));
+    let binString = '';
+    const bytes = new Uint8Array(buf);
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binString += String.fromCharCode(bytes[i]);
+    }
     return btoa(binString);
 }
 
