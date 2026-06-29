@@ -568,7 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleDeleteRecord() {
         if (!currentRecordForDetail) return;
         
-        verifyIdentity(`確認刪除「${currentRecordForDetail.title}」？此操作無法還原。`, async () => {
+        if (confirm(`確認刪除「${currentRecordForDetail.title}」？此操作無法還原。`)) {
             vaultRecords = vaultRecords.filter(r => r.id !== currentRecordForDetail.id);
             try {
                 await saveVaultToStorage(masterPassword);
@@ -578,7 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) {
                 showToast("刪除失敗");
             }
-        });
+        }
     }
 
     // Password generator function
@@ -666,7 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleCloudRestore() {
-        verifyIdentity("確認從雲端還原？此操作將覆蓋您目前手機上的資料。", async () => {
+        if (confirm("確認從雲端還原？此操作將覆蓋您目前手機上的資料。")) {
             try {
                 showToast("正在下載雲端備份...");
                 const encryptedPayload = await window.GoogleDriveSync.restore();
@@ -689,7 +689,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) {
                 showToast(e.message || "雲端還原失敗，可能密碼不同或無雲端備份");
             }
-        });
+        }
     }
 
     // --- Local Backup / Import Interactions ---
@@ -726,7 +726,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error("無效的備份檔案格式");
                 }
 
-                verifyIdentity("匯入此備份會覆蓋目前的所有保險箱紀錄。請輸入目前的主密碼以驗證：", async () => {
+                if (confirm("匯入此備份會覆蓋目前的所有保險箱紀錄。確認要匯入嗎？")) {
                     try {
                         // Check if we can decrypt it with the entered password
                         const decryptedStr = await window.VaultCrypto.decryptVault(
@@ -944,14 +944,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const doubleCheck = confirm("警告：此操作會完全清除手機上的保險箱資料。您確定要繼續嗎？");
         if (!doubleCheck) return;
 
-        verifyIdentity("請輸入您的主密碼以授權完全清除：", () => {
-            localStorage.clear();
-            sessionStorage.clear();
-            showToast("所有本地資料已安全擦除");
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
-        });
+        localStorage.clear();
+        sessionStorage.clear();
+        showToast("所有本地資料已安全擦除");
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
     }
 
     // --- EVENT LISTENERS & TRIGGERS ---
