@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quickfind-v5';
+const CACHE_NAME = 'quickfind-v6';
 const ASSETS = [
   './',
   './index.html',

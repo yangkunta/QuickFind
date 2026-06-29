@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const lockPasswordInput = document.getElementById('lock-password-input');
     const lockPwdToggle = document.getElementById('lock-pwd-toggle');
     const lockSubmitBtn = document.getElementById('lock-submit-btn');
+    const lockResetBtn = document.getElementById('lock-reset-btn');
 
     // Vault Main UI Elements
     const pageTitle = document.getElementById('page-title');
@@ -185,12 +186,14 @@ document.addEventListener('DOMContentLoaded', () => {
             lockScreenSubtitle.innerText = "請建立您的主金庫加密密碼 (請務必記住)";
             lockStateInput.style.display = 'flex';
             lockSubmitBtn.innerText = "建立新保險箱";
+            if (lockResetBtn) lockResetBtn.style.display = 'none';
         } else {
             // Needs master password (session expired or first run)
             lockScreenTitle.innerText = "VaultOne 鎖定中";
             lockScreenSubtitle.innerText = "請輸入主密碼以解鎖您的保險箱";
             lockStateInput.style.display = 'flex';
             lockSubmitBtn.innerText = "解鎖保險箱";
+            if (lockResetBtn) lockResetBtn.style.display = 'block';
         }
         
         lockScreen.classList.remove('unlock-anim');
@@ -957,6 +960,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lock screen triggers
     lockSubmitBtn.onclick = handleUnlock;
     lockPasswordInput.onkeypress = (e) => { if (e.key === 'Enter') handleUnlock(); };
+    if (lockResetBtn) {
+        lockResetBtn.onclick = () => {
+            if (confirm("警告：如果您一直解鎖失敗，可能是因為密碼錯誤或之前的資料已經損壞。您可以選擇『重設保險箱』，但這將會『完全清除』手機上目前的保險箱紀錄！確定要重設嗎？")) {
+                localStorage.clear();
+                sessionStorage.clear();
+                showToast("保險箱已重設。");
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        };
+    }
 
 
     lockPwdToggle.onclick = () => {

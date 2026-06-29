@@ -13,23 +13,56 @@ function bufferToString(buf) {
     return new TextDecoder().decode(buf);
 }
 
-// Helper: Convert ArrayBuffer to Base64
+const base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+// Helper: Convert ArrayBuffer to Base64 (Manual robust implementation)
 function bufferToBase64(buf) {
-    let binString = '';
     const bytes = new Uint8Array(buf);
-    for (let i = 0; i < bytes.byteLength; i++) {
-        binString += String.fromCharCode(bytes[i]);
+    let base64 = "";
+    let i;
+    for (i = 0; i < bytes.byteLength - 2; i += 3) {
+        base64 += base64chars[bytes[i] >> 2];
+        base64 += base64chars[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
+        base64 += base64chars[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
+        base64 += base64chars[bytes[i + 2] & 63];
     }
-    return btoa(binString);
+    if (i === bytes.byteLength - 2) {
+        base64 += base64chars[bytes[i] >> 2];
+        base64 += base64chars[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
+        base64 += base64chars[(bytes[i + 1] & 15) << 2];
+        base64 += "=";
+    } else if (i === bytes.byteLength - 1) {
+        base64 += base64chars[bytes[i] >> 2];
+        base64 += base64chars[(bytes[i] & 3) << 4];
+        base64 += "==";
+    }
+    return base64;
 }
 
-// Helper: Convert Base64 to ArrayBuffer
+// Helper: Convert Base64 to ArrayBuffer (Manual robust implementation)
 function base64ToBuffer(b64) {
-    const binString = atob(b64);
-    const len = binString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-        bytes[i] = binString.charCodeAt(i);
+    let bufferLength = b64.length * 0.75;
+    if (b64[b64.length - 1] === "=") bufferLength--;
+    if (b64[b64.length - 2] === "=") bufferLength--;
+    
+    const bytes = new Uint8Array(bufferLength);
+    let p = 0;
+    
+    // Create reverse lookup table
+    const lookup = new Uint8Array(256);
+    for (let i = 0; i < base64chars.length; i++) {
+        lookup[base64chars.charCodeAt(i)] = i;
+    }
+    
+    for (let i = 0; i < b64.length; i += 4) {
+        let encoded1 = lookup[b64.charCodeAt(i)];
+        let encoded2 = lookup[b64.charCodeAt(i + 1)];
+        let encoded3 = lookup[b64.charCodeAt(i + 2)];
+        let encoded4 = lookup[b64.charCodeAt(i + 3)];
+        
+        bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
+        if (b64[i + 2] !== "=") bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
+        if (b64[i + 3] !== "=") bytes[p++] = ((encoded3 & 3) << 6) | (encoded4 & 63);
     }
     return bytes.buffer;
 }
