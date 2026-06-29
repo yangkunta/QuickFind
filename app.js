@@ -83,14 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lock Screen Elements
     const lockScreenTitle = document.getElementById('lock-screen-title');
     const lockScreenSubtitle = document.getElementById('lock-screen-subtitle');
-    const lockStateActive = document.getElementById('lock-state-active');
     const lockStateInput = document.getElementById('lock-state-input');
     const lockPasswordInput = document.getElementById('lock-password-input');
     const lockPwdToggle = document.getElementById('lock-pwd-toggle');
     const lockSubmitBtn = document.getElementById('lock-submit-btn');
-    const fingerprintBtn = document.getElementById('fingerprint-btn');
-    const pwdFallbackBtn = document.getElementById('pwd-fallback-btn');
-    const biometricBackBtn = document.getElementById('biometric-back-btn');
 
     // Vault Main UI Elements
     const pageTitle = document.getElementById('page-title');
@@ -177,15 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return localStorage.getItem('vaultone_db') !== null;
     }
 
-    // Check if biometric (Quick Unlock) is available (requires password cached in sessionStorage)
-    function isBiometricSessionAvailable() {
-        return sessionStorage.getItem('vaultone_cached_pwd') !== null;
-    }
 
-    // Save Master Password in temporary session storage (wiped when tab closes)
-    function cachePasswordInSession(password) {
-        sessionStorage.setItem('vaultone_cached_pwd', password);
-    }
 
     // --- Onboarding & Lock Screen Management ---
 
@@ -195,25 +183,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // First time setup
             lockScreenTitle.innerText = "設定主密碼";
             lockScreenSubtitle.innerText = "請建立您的主金庫加密密碼 (請務必記住)";
-            lockStateActive.style.display = 'none';
             lockStateInput.style.display = 'flex';
             lockSubmitBtn.innerText = "建立新保險箱";
-            biometricBackBtn.style.display = 'none';
-        } else if (isBiometricSessionAvailable()) {
-            // Biometrics is set up and cached (Quick Unlock is active)
-            lockScreenTitle.innerText = "VaultOne 鎖定中";
-            lockScreenSubtitle.innerText = "使用三星 S26 螢幕指紋快速解鎖";
-            lockStateActive.style.display = 'flex';
-            lockStateInput.style.display = 'none';
-            biometricBackBtn.style.display = 'none';
         } else {
             // Needs master password (session expired or first run)
             lockScreenTitle.innerText = "VaultOne 鎖定中";
             lockScreenSubtitle.innerText = "請輸入主密碼以解鎖您的保險箱";
-            lockStateActive.style.display = 'none';
             lockStateInput.style.display = 'flex';
             lockSubmitBtn.innerText = "解鎖保險箱";
-            biometricBackBtn.style.display = 'none';
         }
         
         lockScreen.classList.remove('unlock-anim');
@@ -234,7 +211,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 vaultRecords = [];
                 // Save empty records
                 await saveVaultToStorage(enteredPassword);
-                cachePasswordInSession(enteredPassword);
                 
                 showToast("保險箱初始化成功！");
                 unlockApp();
@@ -255,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 masterPassword = enteredPassword;
                 vaultRecords = JSON.parse(decryptedStr);
-                cachePasswordInSession(enteredPassword);
                 
                 showToast("解鎖成功！");
                 unlockApp();
@@ -282,38 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initLockScreen();
     }
 
-    // Simulated fingerprint recognition with S26 tactile feedback feeling
-    function triggerSimulatedFingerprint() {
-        if (!isBiometricSessionAvailable()) {
-            showToast("指紋金鑰過期，請使用主密碼解鎖");
-            pwdFallbackBtn.click();
-            return;
-        }
-        
-        showToast("指紋辨識中...");
-        setTimeout(async () => {
-            const cachedPwd = sessionStorage.getItem('vaultone_cached_pwd');
-            const dbData = JSON.parse(localStorage.getItem('vaultone_db'));
-            
-            try {
-                const decryptedStr = await window.VaultCrypto.decryptVault(
-                    dbData.ciphertext,
-                    dbData.iv,
-                    dbData.salt,
-                    cachedPwd
-                );
-                masterPassword = cachedPwd;
-                vaultRecords = JSON.parse(decryptedStr);
-                
-                showToast("指紋辨識完成");
-                unlockApp();
-            } catch (e) {
-                showToast("指紋解鎖失敗，請輸入主密碼");
-                sessionStorage.removeItem('vaultone_cached_pwd');
-                pwdFallbackBtn.click();
-            }
-        }, 800); // 800ms scanning delay
-    }
+
 
     // --- Auto-Lock Mechanism ---
 
@@ -986,7 +930,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(async () => {
                 try {
                     masterPassword = newPassword;
-                    cachePasswordInSession(newPassword);
                     await saveVaultToStorage(newPassword);
                     showToast("主密碼已變更，資料已重新加密");
                 } catch (e) {
@@ -1016,21 +959,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lock screen triggers
     lockSubmitBtn.onclick = handleUnlock;
     lockPasswordInput.onkeypress = (e) => { if (e.key === 'Enter') handleUnlock(); };
-    fingerprintBtn.onclick = triggerSimulatedFingerprint;
-    
-    pwdFallbackBtn.onclick = () => {
-        lockStateActive.style.display = 'none';
-        lockStateInput.style.display = 'flex';
-        if (isBiometricSessionAvailable()) {
-            biometricBackBtn.style.display = 'inline';
-        }
-    };
-    
-    biometricBackBtn.onclick = () => {
-        lockStateActive.style.display = 'flex';
-        lockStateInput.style.display = 'none';
-        biometricBackBtn.style.display = 'none';
-    };
+
 
     lockPwdToggle.onclick = () => {
         const isPwd = lockPasswordInput.type === 'password';
@@ -1188,10 +1117,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initLockScreen();
 
-    // Trigger biometric automatically if cached
-    if (isVaultInitialized() && isBiometricSessionAvailable()) {
-        setTimeout(triggerSimulatedFingerprint, 500);
-    }
+
 });
 
 // --- Generic Helper Utility Functions ---

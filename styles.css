@@ -555,55 +555,7 @@ h1, h2, h3, h4 {
     gap: 32px;
 }
 
-/* Fingerprint Sensor UI */
-.fingerprint-sensor {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background-color: var(--card-bg);
-    border: 2px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 42px;
-    color: var(--accent-blue);
-    cursor: pointer;
-    position: relative;
-    transition: var(--transition-bounce);
-}
 
-.fingerprint-sensor:active {
-    transform: scale(0.9);
-    background-color: var(--card-bg-active);
-    color: var(--accent-green);
-    border-color: var(--accent-green);
-}
-
-/* Fingerprint scanning ripple effect */
-.fingerprint-sensor::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 2px solid var(--accent-blue);
-    opacity: 0.4;
-    animation: ripple 2s infinite ease-out;
-    pointer-events: none;
-}
-
-@keyframes ripple {
-    0% { transform: scale(1); opacity: 0.6; }
-    100% { transform: scale(1.4); opacity: 0; }
-}
-
-.password-fallback-link {
-    color: var(--accent-blue);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-}
 
 /* Toast Message */
 .toast {

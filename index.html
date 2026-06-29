@@ -31,15 +31,7 @@
 
             <!-- Lock Interaction Area -->
             <div class="lock-interactive-area">
-                <!-- A: Normal Lock State (Fingerprint) -->
-                <div id="lock-state-active" class="lock-interactive-area" style="display: none;">
-                    <div class="fingerprint-sensor" id="fingerprint-btn">
-                        <span class="material-symbols-rounded" style="font-size: 48px;">fingerprint</span>
-                    </div>
-                    <span class="password-fallback-link" id="pwd-fallback-btn">使用主密碼解鎖</span>
-                </div>
-
-                <!-- B: Password Input State (Fallback or Onboarding) -->
+                <!-- Password Input State -->
                 <div id="lock-state-input" class="lock-interactive-area" style="width: 100%;">
                     <div class="form-group" style="width: 100%; max-width: 320px;">
                         <div class="input-container">
@@ -50,7 +42,6 @@
                         </div>
                     </div>
                     <button class="btn-primary" id="lock-submit-btn" style="max-width: 320px;">解鎖保險箱</button>
-                    <span class="password-fallback-link" id="biometric-back-btn" style="display: none;">返回指紋辨識</span>
                 </div>
             </div>
 
