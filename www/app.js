@@ -33,6 +33,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+    try {
     // If the event fired before DOMContentLoaded, we handle it here
     if (deferredPrompt) {
         const btnInstallApp = document.getElementById('btn-install-app');
@@ -1161,7 +1162,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initLockScreen();
 
-
+    } catch (err) {
+        document.getElementById('lock-screen-subtitle').innerText = "ERROR: " + err.message + "\n" + err.stack;
+        document.getElementById('lock-screen-subtitle').style.color = 'red';
+    }
 });
 
 // --- Generic Helper Utility Functions ---
