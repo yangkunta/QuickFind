@@ -1,0 +1,6 @@
+{
+  "appId": "com.quickfind.app",
+  "appName": "QuickFind",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

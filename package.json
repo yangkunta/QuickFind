@@ -1,0 +1,28 @@
+{
+  "name": "mymem",
+  "version": "1.0.0",
+  "description": "QuickFind 是一個極致簡化、高安全性的本地端私密筆記與密碼管理器 (Progressive Web App, PWA)。 這個專案專注於提供**最快、最安全的查詢與維護體驗**，完全在本地端加密，確保資料零外洩。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yangkunta/QuickFind.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yangkunta/QuickFind/issues"
+  },
+  "homepage": "https://github.com/yangkunta/QuickFind#readme",
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  }
+}
