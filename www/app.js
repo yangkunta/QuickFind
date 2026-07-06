@@ -569,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Delete Record
-    function handleDeleteRecord() {
+    async function handleDeleteRecord() {
         if (!currentRecordForDetail) return;
         
         if (confirm(`確認刪除「${currentRecordForDetail.title}」？此操作無法還原。`)) {
@@ -749,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } catch (err) {
                         showToast("還原失敗：此備份檔的加密主密碼與目前密碼不相符！");
                     }
-                });
+                }
             } catch (err) {
                 showToast("匯入失敗：檔案格式不正確！");
             }
