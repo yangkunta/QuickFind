@@ -942,17 +942,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Wipe all data
+    let wipeClickCount = 0;
     function handleWipeVault() {
-        const doubleCheck = confirm("警告：此操作會完全清除手機上的保險箱資料。您確定要繼續嗎？");
-        if (!doubleCheck) return;
-
-        localStorage.clear();
-        sessionStorage.clear();
-        showToast("所有本地資料已安全擦除");
-        setTimeout(() => {
-            window.location.reload();
-        }, 1000);
+        if (wipeClickCount === 0) {
+            const originalText = btnResetVault.querySelector('.item-title').innerText;
+            btnResetVault.querySelector('.item-title').innerText = "⚠️ 確定清除所有資料？(再次點擊確認)";
+            btnResetVault.querySelector('.item-title').style.fontWeight = "bold";
+            wipeClickCount++;
+            
+            setTimeout(() => {
+                if (wipeClickCount > 0) {
+                    wipeClickCount = 0;
+                    btnResetVault.querySelector('.item-title').innerText = originalText;
+                    btnResetVault.querySelector('.item-title').style.fontWeight = "normal";
+                }
+            }, 3000);
+        } else {
+            wipeClickCount = 0;
+            localStorage.clear();
+            sessionStorage.clear();
+            showToast("所有本地資料已安全擦除");
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
     }
 
     // --- EVENT LISTENERS & TRIGGERS ---
@@ -960,9 +973,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lock screen triggers
     lockSubmitBtn.onclick = handleUnlock;
     lockPasswordInput.onkeypress = (e) => { if (e.key === 'Enter') handleUnlock(); };
+    let resetClickCount = 0;
     if (lockResetBtn) {
         lockResetBtn.onclick = () => {
-            if (confirm("警告：如果您一直解鎖失敗，可能是因為密碼錯誤或之前的資料已經損壞。您可以選擇『重設保險箱』，但這將會『完全清除』手機上目前的保險箱紀錄！確定要重設嗎？")) {
+            if (resetClickCount === 0) {
+                const originalText = lockResetBtn.innerText;
+                const originalColor = lockResetBtn.style.color;
+                lockResetBtn.innerText = "⚠️ 確定清除？(再次點擊確認)";
+                lockResetBtn.style.color = "red";
+                lockResetBtn.style.fontWeight = "bold";
+                resetClickCount++;
+                
+                setTimeout(() => {
+                    if (resetClickCount > 0) {
+                        resetClickCount = 0;
+                        lockResetBtn.innerText = originalText;
+                        lockResetBtn.style.color = originalColor;
+                        lockResetBtn.style.fontWeight = "normal";
+                    }
+                }, 3000);
+            } else {
+                resetClickCount = 0;
                 localStorage.clear();
                 sessionStorage.clear();
                 showToast("保險箱已重設。");
