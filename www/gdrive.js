@@ -1,5 +1,5 @@
 /**
- * VaultOne Google Drive Sync Module
+ * QuickFind Google Drive Sync Module
  * Manages OAuth2 authorization and file backup/restore using Google Drive API (v3).
  * Supports both actual Google API and a simulated mock mode for instant evaluation.
  */
@@ -154,7 +154,7 @@ class GoogleDriveSync {
         const fileId = await this.findBackupFile(token);
 
         if (!fileId) {
-            throw new Error("在您的 Google 雲端硬碟中找不到 VaultOne 備份檔案");
+            throw new Error("在您的 Google 雲端硬碟中找不到 QuickFind 備份檔案");
         }
 
         const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
@@ -250,7 +250,7 @@ class GoogleDriveSync {
             setTimeout(() => {
                 const encryptedDataString = localStorage.getItem('gdrive_mock_backup_file');
                 if (!encryptedDataString) {
-                    reject(new Error("在您的 Google 雲端硬碟中找不到 VaultOne 備份檔案"));
+                    reject(new Error("在您的 Google 雲端硬碟中找不到 QuickFind 備份檔案"));
                 } else {
                     resolve(encryptedDataString);
                 }

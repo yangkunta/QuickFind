@@ -1,5 +1,5 @@
 /**
- * VaultOne Main Application Logic
+ * QuickFind Main Application Logic
  * Manages State, UI rendering, event listeners, auto-lock, and interactions.
  */
 
@@ -186,14 +186,14 @@ document.addEventListener('DOMContentLoaded', () => {
             lockScreenTitle.innerText = "設定主密碼";
             lockScreenSubtitle.innerText = "請建立您的主金庫加密密碼 (請務必記住)";
             lockStateInput.style.display = 'flex';
-            lockSubmitBtn.innerText = "建立新保險箱";
+            lockSubmitBtn.innerText = "建立新快取盒";
             if (lockResetBtn) lockResetBtn.style.display = 'none';
         } else {
             // Needs master password (session expired or first run)
-            lockScreenTitle.innerText = "VaultOne 鎖定中";
-            lockScreenSubtitle.innerText = "請輸入主密碼以解鎖您的保險箱";
+            lockScreenTitle.innerText = "QuickFind 鎖定中";
+            lockScreenSubtitle.innerText = "請輸入主密碼以解鎖您的快取盒";
             lockStateInput.style.display = 'flex';
-            lockSubmitBtn.innerText = "解鎖保險箱";
+            lockSubmitBtn.innerText = "解鎖快取盒";
             if (lockResetBtn) lockResetBtn.style.display = 'block';
         }
         
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Save empty records
                 await saveVaultToStorage(enteredPassword);
                 
-                showToast("保險箱初始化成功！");
+                showToast("快取盒初始化成功！");
                 unlockApp();
             } catch (e) {
                 showToast("初始化錯誤，請重試");
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (lockScreen.classList.contains('unlock-anim')) {
             autoLockTimer = setTimeout(() => {
                 lockApp();
-                showToast("閒置逾時，保險箱已鎖定");
+                showToast("閒置逾時，快取盒已鎖定");
             }, AUTO_LOCK_TIMEOUT);
         }
     }
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
             vaultRecordsList.innerHTML = `
                 <div style="text-align: center; padding: 48px 0; color: var(--text-muted);">
                     <span class="material-symbols-rounded" style="font-size: 48px; margin-bottom: 8px; display: block;">no_accounts</span>
-                    無符合條件的保險箱紀錄
+                    無符合條件的快取盒紀錄
                 </div>
             `;
             return;
@@ -657,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // The JSON in localStorage is already encrypted. We upload the encrypted string.
             const encryptedPayload = localStorage.getItem('vaultone_db');
             if (!encryptedPayload) {
-                showToast("無本地保險箱資料可供備份");
+                showToast("無本地快取盒資料可供備份");
                 return;
             }
 
@@ -701,7 +701,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleLocalExport() {
         const encryptedPayload = localStorage.getItem('vaultone_db');
         if (!encryptedPayload) {
-            showToast("沒有保險箱資料可以匯出");
+            showToast("沒有快取盒資料可以匯出");
             return;
         }
 
@@ -730,7 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error("無效的備份檔案格式");
                 }
 
-                if (confirm("匯入此備份會覆蓋目前的所有保險箱紀錄。確認要匯入嗎？")) {
+                if (confirm("匯入此備份會覆蓋目前的所有快取盒紀錄。確認要匯入嗎？")) {
                     try {
                         // Check if we can decrypt it with the entered password
                         const decryptedStr = await window.VaultCrypto.decryptVault(
@@ -997,7 +997,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 resetClickCount = 0;
                 localStorage.clear();
                 sessionStorage.clear();
-                showToast("保險箱已重設。");
+                showToast("快取盒已重設。");
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);

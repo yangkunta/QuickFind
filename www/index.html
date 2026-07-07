@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VaultOne - 安全密碼管理器</title>
+    <title>QuickFind - 安全密碼管理器</title>
     <!-- Google Material Symbols Rounded -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -25,8 +25,8 @@
                 <div class="lock-logo">
                     <span class="material-symbols-rounded">security</span>
                 </div>
-                <h2 id="lock-screen-title" class="lock-title">VaultOne</h2>
-                <p id="lock-screen-subtitle" class="lock-subtitle">您在三星 S26 上的安全保險箱</p>
+                <h2 id="lock-screen-title" class="lock-title">QuickFind</h2>
+                <p id="lock-screen-subtitle" class="lock-subtitle">您在三星 S26 上的安全快取盒</p>
             </div>
 
             <!-- Lock Interaction Area -->
@@ -41,13 +41,13 @@
                             </button>
                         </div>
                     </div>
-                    <button class="btn-primary" id="lock-submit-btn" style="max-width: 320px;">解鎖保險箱</button>
-                    <span class="password-fallback-link" id="lock-reset-btn" style="display: block; margin-top: 16px; color: var(--danger-red, #ff4d4f); text-align: center; cursor: pointer;">重設保險箱 (清除資料)</span>
+                    <button class="btn-primary" id="lock-submit-btn" style="max-width: 320px;">解鎖快取盒</button>
+                    
                 </div>
             </div>
 
             <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
-                VaultOne v1.0.9<br>
+                QuickFind v1.1.0<br>
                 本地端加密 • 零知識架構
             </div>
         </div>
@@ -57,8 +57,8 @@
             
             <!-- Collapsible Header -->
             <div class="oneui-header">
-                <span class="subtitle">VaultOne 安全金庫</span>
-                <span class="title" id="page-title">保險箱</span>
+                <span class="subtitle">QuickFind 安全金庫</span>
+                <span class="title" id="page-title">快取盒</span>
             </div>
 
             <!-- Search Area -->
@@ -200,7 +200,7 @@
                             </div>
                             <div class="item-details">
                                 <div class="item-title">變更主密碼</div>
-                                <div class="item-username">重新設定保險箱金鑰</div>
+                                <div class="item-username">重新設定快取盒金鑰</div>
                             </div>
                         </div>
                     </div>
@@ -211,14 +211,14 @@
                             </div>
                             <div class="item-details">
                                 <div class="item-title" style="color: var(--accent-red);">清除所有資料</div>
-                                <div class="item-username">重設 App 並刪除保險箱內容</div>
+                                <div class="item-username">重設 App 並刪除快取盒內容</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <div style="text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 24px;">
-                    VaultOne v1.0.6<br>
+                    QuickFind v1.1.0<br>
                     本地端加密 • 零知識架構
                 </div>
             </div>
@@ -249,7 +249,7 @@
                     <button class="close-sheet-btn" id="close-add-sheet" style="font-size: 22px; display: flex; align-items: center; padding: 4px; background: none; border: none; color: var(--text-primary); cursor: pointer;">
                         <span class="material-symbols-rounded">arrow_back</span>
                     </button>
-                    <h3 id="add-sheet-title" style="font-size: 20px; font-weight: 600; margin: 0;">新增保險箱紀錄</h3>
+                    <h3 id="add-sheet-title" style="font-size: 20px; font-weight: 600; margin: 0;">新增快取盒紀錄</h3>
                 </div>
                 <div class="bottom-sheet-body" style="padding: 24px; overflow-y: auto;">
                     <form id="add-record-form" onsubmit="return false;">
