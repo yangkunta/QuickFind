@@ -47,6 +47,12 @@ jobs:
           fi
           npx cap sync android
 
+      - name: Fix Android Compile SDK Version
+        run: |
+          # The capgo updater depends on androidx.work:work-runtime:2.10.5
+          # which requires compileSdkVersion 35
+          sed -i 's/compileSdkVersion = 34/compileSdkVersion = 35/g' android/variables.gradle
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
