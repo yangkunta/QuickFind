@@ -57,7 +57,37 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    // ==========================================
+    const APP_VERSION = '1.1.0';
+
+    // OTA Live Update Logic (Capgo)
+    if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
+        const Updater = Capacitor.Plugins.CapacitorUpdater;
+        // Notify app is ready to prevent rollback loop
+        Updater.notifyAppReady();
+
+        // Poll version.json from GitHub Pages
+        fetch('https://yangkunta.github.io/QuickFind/version.json?t=' + Date.now())
+            .then(res => res.json())
+            .then(async (data) => {
+                if (data.version && data.version !== APP_VERSION) {
+                    showToast(`發現新版本 ${data.version}，正在背景下載更新...`, 3000);
+                    try {
+                        const versionInfo = await Updater.download({
+                            url: 'https://yangkunta.github.io/QuickFind/update.zip',
+                            version: data.version
+                        });
+                        showToast("更新檔下載完成，即將為您重新啟動套用！", 3000);
+                        setTimeout(async () => {
+                            await Updater.set({ id: versionInfo.id });
+                        }, 2500);
+                    } catch (err) {
+                        console.error('OTA Update failed:', err);
+                    }
+                }
+            })
+            .catch(err => console.log('OTA Version check failed:', err));
+    }
+
     // PWA Service Worker Registration & Install
     // ==========================================
     if ('serviceWorker' in navigator) {

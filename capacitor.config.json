@@ -1,6 +1,11 @@
 {
-  "appId": "com.quickfind.app",
-  "appName": "QuickFind",
+  "appId": "com.quickfindpass.app",
+  "appName": "QuickFindPass",
   "webDir": "www",
-  "bundledWebRuntime": false
+  "bundledWebRuntime": false,
+  "plugins": {
+    "CapacitorUpdater": {
+      "autoUpdate": false
+    }
+  }
 }
