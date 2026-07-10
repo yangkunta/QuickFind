@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    const APP_VERSION = '1.1.13';
+    const APP_VERSION = '1.1.14';
 
     // OTA Live Update Logic (Capgo)
     if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
@@ -557,7 +557,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleDeleteRecord() {
         if (!currentRecordForDetail) return;
         
-        if (confirm(`確認刪除「${currentRecordForDetail.title}」？此操作無法還原。`)) {
+        const dispName = currentRecordForDetail.notes ? (currentRecordForDetail.notes.substring(0, 20) + (currentRecordForDetail.notes.length > 20 ? '...' : '')) : (currentRecordForDetail.category || '此紀錄');
+        if (confirm(`確認刪除「${dispName}」？此操作無法還原。`)) {
             vaultRecords = vaultRecords.filter(r => r.id !== currentRecordForDetail.id);
             try {
                 await saveVaultToStorage(masterPassword);
