@@ -47,7 +47,7 @@
             </div>
 
             <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
-                QuickFind v1.1.9<br>
+                QuickFind v1.1.10<br>
                 本地端加密 • 零知識架構
             </div>
         </div>
@@ -95,55 +95,6 @@
             </div>
             
             <div class="vault-content" style="padding-bottom: 80px;">
-                <!-- Google Drive Sync Section -->
-                <div class="settings-section-title">雲端同步 (Google Drive)</div>
-                <div class="card-group" style="padding: 8px 0;">
-                    <!-- Google Cloud Credentials -->
-                    <div style="padding: 12px 20px;">
-                        <div class="sync-instructions" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                            <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--accent-blue);">如何設定 Google Drive 同步？</h4>
-                            <ol style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
-                                <li>前往 <a href="https://console.cloud.google.com/" target="_blank" style="color: var(--accent-blue); text-decoration: none;">Google Cloud Console</a> 建立專案。</li>
-                                <li>在「API 和服務」中啟用 <b>Google Drive API</b>。</li>
-                                <li>設定「OAuth 同意畫面」(User Type 選外部，並加入您的 Google 帳號為測試人員)。</li>
-                                <li>建立憑證 (選擇 <b>網頁應用程式</b>)。</li>
-                                <li>將 <b>已授權的 JavaScript 來源</b> 設定為 <code>https://yangkunta.github.io</code>。</li>
-                                <li>將取得的 Client ID 貼到下方欄位並儲存。</li>
-                            </ol>
-                        </div>
-                        <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Google Cloud OAuth Client ID (留空使用模擬沙盒測試)</label>
-                        <div class="input-container">
-                            <input type="text" id="setting-client-id" placeholder="輸入您的 Client ID..." style="background-color: var(--bg-primary); padding: 10px 12px; font-size: 13px;">
-                        </div>
-                        <button class="btn-secondary" id="save-client-id-btn" style="margin-top: 10px; padding: 10px; font-size: 13px; border-radius: var(--border-radius-small);">儲存 Client ID</button>
-                    </div>
-                    
-                    <div class="list-item" id="btn-cloud-backup">
-                        <div class="item-left">
-                            <div class="item-icon" style="background-color: rgba(48, 209, 88, 0.1); color: var(--accent-green);">
-                                <span class="material-symbols-rounded">cloud_upload</span>
-                            </div>
-                            <div class="item-details">
-                                <div class="item-title">備份到雲端硬碟</div>
-                                <div class="item-username" id="cloud-backup-info">未曾備份過</div>
-                            </div>
-                        </div>
-                        <span class="material-symbols-rounded" style="color: var(--text-muted);">chevron_right</span>
-                    </div>
-                    
-                    <div class="list-item" id="btn-cloud-restore">
-                        <div class="item-left">
-                            <div class="item-icon" style="background-color: rgba(255, 214, 10, 0.1); color: var(--accent-yellow);">
-                                <span class="material-symbols-rounded">cloud_download</span>
-                            </div>
-                            <div class="item-details">
-                                <div class="item-title">從雲端硬碟還原</div>
-                                <div class="item-username">會覆蓋目前本地端資料</div>
-                            </div>
-                        </div>
-                        <span class="material-symbols-rounded" style="color: var(--text-muted);">chevron_right</span>
-                    </div>
-                </div>
 
                 <!-- Backup & Restore Section -->
                 <div class="settings-section-title">本地資料備份</div>
@@ -229,7 +180,7 @@
                 </div>
                 
                 <div style="text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 24px;">
-                    QuickFind v1.1.9<br>
+                    QuickFind v1.1.10<br>
                     本地端加密 • 零知識架構
                 </div>
             </div>

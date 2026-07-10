@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    const APP_VERSION = '1.1.9';
+    const APP_VERSION = '1.1.10';
 
     // OTA Live Update Logic (Capgo)
     if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
@@ -165,11 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let pendingAuthCallback = null; // Stores action to take after auth verify
 
     // Settings Panel Elements
-    const settingClientId = document.getElementById('setting-client-id');
-    const saveClientIdBtn = document.getElementById('save-client-id-btn');
-    const btnCloudBackup = document.getElementById('btn-cloud-backup');
-    const btnCloudRestore = document.getElementById('btn-cloud-restore');
-    const cloudBackupInfo = document.getElementById('cloud-backup-info');
     const btnLocalExport = document.getElementById('btn-local-export');
     const localImportFile = document.getElementById('local-import-file');
     const csvImportFile = document.getElementById('csv-import-file');
@@ -634,58 +629,6 @@ document.addEventListener('DOMContentLoaded', () => {
         strengthLabel.style.color = labelColor;
     }
 
-    // --- Google Drive Backup / Restore UI Interactions ---
-
-    function updateGoogleDriveUI() {
-        const info = window.GoogleDriveSync.getMockBackupInfo();
-        cloudBackupInfo.innerText = info ? `上次備份：${info}` : "未曾備份過";
-        settingClientId.value = window.GoogleDriveSync.clientId;
-    }
-
-    async function handleCloudBackup() {
-        try {
-            showToast("正在加密金庫並上傳到雲端...");
-            // The JSON in localStorage is already encrypted. We upload the encrypted string.
-            const encryptedPayload = localStorage.getItem('vaultone_db');
-            if (!encryptedPayload) {
-                showToast("無本地快取盒資料可供備份");
-                return;
-            }
-
-            await window.GoogleDriveSync.backup(encryptedPayload);
-            showToast("雲端備份成功！");
-            updateGoogleDriveUI();
-        } catch (e) {
-            showToast(e.message || "雲端備份失敗");
-        }
-    }
-
-    async function handleCloudRestore() {
-        if (confirm("確認從雲端還原？此操作將覆蓋您目前手機上的資料。")) {
-            try {
-                showToast("正在下載雲端備份...");
-                const encryptedPayload = await window.GoogleDriveSync.restore();
-                
-                // Let's verify decryption of the downloaded file with current master password
-                const dbData = JSON.parse(encryptedPayload);
-                const decryptedStr = await window.VaultCrypto.decryptVault(
-                    dbData.ciphertext,
-                    dbData.iv,
-                    dbData.salt,
-                    masterPassword
-                );
-
-                // Success! Write to local storage and update memory
-                localStorage.setItem('vaultone_db', encryptedPayload);
-                vaultRecords = JSON.parse(decryptedStr);
-                
-                showToast("從雲端還原成功！");
-                renderRecords(searchInput.value);
-            } catch (e) {
-                showToast(e.message || "雲端還原失敗，可能密碼不同或無雲端備份");
-            }
-        }
-    }
 
     // --- Local Backup / Import Interactions ---
 
@@ -742,7 +685,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 3. Desktop Browser Fallback
+        // 3. Fallbacks
+        if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+            showToast("⚠️ 匯出失敗：請至 GitHub 重新下載最新版 APP 才能使用匯出功能！");
+            return;
+        }
+
+        // Desktop Browser Fallback
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -1085,7 +1034,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tabSettings.classList.add('active');
             mainSettingsView.style.display = 'flex';
             document.getElementById('settings-page-title').style.color = "#AF52DE";
-            updateGoogleDriveUI();
         }
     }
 
@@ -1188,8 +1136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateGoogleDriveUI();
     };
 
-    btnCloudBackup.onclick = handleCloudBackup;
-    btnCloudRestore.onclick = handleCloudRestore;
+
     btnLocalExport.onclick = handleLocalExport;
     localImportFile.onchange = handleLocalImport;
     csvImportFile.onchange = handleCsvImport;
