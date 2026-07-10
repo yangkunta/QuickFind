@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    const APP_VERSION = '1.1.10';
+    const APP_VERSION = '1.1.11';
 
     // OTA Live Update Logic (Capgo)
     if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
@@ -274,7 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lockScreen.classList.add('unlock-anim');
         // Auto-lock removed
         renderRecords();
-        updateGoogleDriveUI();
     }
 
     // Lock the app
@@ -1128,27 +1127,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') authPromptSubmitBtn.click();
     };
 
-    // Settings actions
-    saveClientIdBtn.onclick = () => {
-        const cid = settingClientId.value.trim();
-        window.GoogleDriveSync.setClientId(cid);
-        showToast(cid ? "已儲存 Client ID，已啟用雲端 API" : "Client ID 已清除，使用模擬沙盒測試");
-        updateGoogleDriveUI();
-    };
-
 
     btnLocalExport.onclick = handleLocalExport;
     localImportFile.onchange = handleLocalImport;
     csvImportFile.onchange = handleCsvImport;
     btnChangePwd.onclick = handleChangePassword;
     btnResetVault.onclick = handleWipeVault;
-
-    // --- Load Scripts & Initialize ---
-
-    window.GoogleDriveSync.loadScripts(() => {
-        console.log("Google APIs and Identity Services loaded.");
-        updateGoogleDriveUI();
-    });
 
     initLockScreen();
 
