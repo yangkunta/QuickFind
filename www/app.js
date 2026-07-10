@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    const APP_VERSION = '1.1.5';
+    const APP_VERSION = '1.1.6';
 
     // OTA Live Update Logic (Capgo)
     if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
@@ -372,11 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
             item.className = 'list-item';
             item.onclick = () => showDetailSheet(rec);
 
-            const displayIcon = getSmartIcon(rec.category, rec.notes);
-            
-            // Subtitle logic
-            const subtitleText = truncateString(rec.description || '無詳細說明', 25);
-            const mainTitle = rec.notes ? rec.notes.split('\n')[0].substring(0, 20) : '(無標題)';
+            const mainTitle = rec.notes ? rec.notes : '(無內容)';
 
             const isMaintMode = document.body.classList.contains('maintenance-mode');
 
@@ -400,19 +396,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             item.innerHTML = `
-                <div class="item-left">
-                    <div class="item-icon" style="background-color: rgba(62, 130, 252, 0.08);">
-                        <span class="material-symbols-rounded">${displayIcon}</span>
-                    </div>
-                    <div class="item-details" style="display: flex; flex-direction: column; gap: 2px;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span class="item-title">${escapeHTML(mainTitle)}</span>
-                            <span style="font-size: 10px; background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); padding: 1px 6px; border-radius: 8px;">${escapeHTML(rec.category || '未分類')}</span>
-                        </div>
-                        <div class="item-username">${subtitleText}</div>
+                <div class="item-left" style="align-items: flex-start; max-width: calc(100% - 40px);">
+                    <div class="item-details" style="display: flex; flex-direction: column; gap: 2px; width: 100%;">
+                        <div class="item-title" style="white-space: pre-wrap; word-break: break-all; -webkit-line-clamp: 4; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">${escapeHTML(mainTitle)}</div>
                     </div>
                 </div>
-                <div class="item-right" onclick="event.stopPropagation();">
+                <div class="item-right" onclick="event.stopPropagation();" style="display: flex; flex-direction: ${isMaintMode ? 'column' : 'row'}; gap: 8px;">
                     ${actionButtonsHtml}
                 </div>
             `;
@@ -507,14 +496,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const detailBody = detailSheet.querySelector('.bottom-sheet-body');
         if (detailBody) detailBody.scrollTop = 0;
 
-        let displayTitle = record.notes ? record.notes.split('\n')[0].substring(0, 20) : "無標題";
-
-        detailTitle.innerHTML = `${escapeHTML(displayTitle)} <span style="font-size:11px; font-weight:500; background:rgba(62, 130, 252, 0.15); color:var(--accent-blue); padding:3px 8px; border-radius:12px; margin-left:8px; vertical-align:middle;">${escapeHTML(record.category || '未分類')}</span>`;
+        detailTitle.innerHTML = escapeHTML(record.category || '未分類');
         detailNotes.innerText = record.notes || "無備註內容";
         detailDescription.innerText = record.description || "無詳細說明";
 
-        const displayIcon = getSmartIcon(record.category, record.notes);
-        detailCardIcon.innerHTML = `<span class="material-symbols-rounded">${displayIcon}</span>`;
+        detailCardIcon.style.display = 'none';
 
         openBottomSheet(detailSheetOverlay, detailSheet);
     }
@@ -711,10 +697,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const blob = new Blob([encryptedPayload], { type: 'application/json' });
+        const fileName = `vaultone_backup_${new Date().toISOString().slice(0,10)}.json`;
+        
+        if (navigator.canShare) {
+            const file = new File([blob], fileName, { type: 'application/json' });
+            if (navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    files: [file],
+                    title: 'QuickFind 備份',
+                    text: '這是我從 QuickFind 匯出的加密備份檔'
+                }).then(() => {
+                    showToast("匯出分享成功");
+                }).catch(e => {
+                    console.error(e);
+                    showToast("匯出分享已取消或失敗");
+                });
+                return;
+            }
+        }
+
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `vaultone_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.download = fileName;
         a.click();
         URL.revokeObjectURL(url);
         showToast("加密備份檔案匯出成功");
@@ -1031,6 +1036,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mainVaultView.style.display = 'flex';
             document.body.classList.remove('maintenance-mode');
             pageTitle.innerText = "查詢";
+            pageTitle.style.color = "#34C759";
             isShowingAll = false;
             searchInput.value = '';
             searchClearBtn.style.display = 'none';
@@ -1040,6 +1046,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mainVaultView.style.display = 'flex';
             document.body.classList.add('maintenance-mode');
             pageTitle.innerText = "維護";
+            pageTitle.style.color = "#FFCC00";
             isShowingAll = false;
             searchInput.value = '';
             searchClearBtn.style.display = 'none';
@@ -1047,6 +1054,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (tabName === 'settings') {
             tabSettings.classList.add('active');
             mainSettingsView.style.display = 'flex';
+            pageTitle.innerText = "設定";
+            pageTitle.style.color = "#AF52DE";
             updateGoogleDriveUI();
         }
     }
