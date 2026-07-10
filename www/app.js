@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    const APP_VERSION = '1.1.4';
+    const APP_VERSION = '1.1.5';
 
     // OTA Live Update Logic (Capgo)
     if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
@@ -66,14 +66,14 @@ document.addEventListener('DOMContentLoaded', () => {
         Updater.notifyAppReady();
 
         // Poll version.json from GitHub Pages
-        fetch('https://qfmyp.netlify.app/version.json?t=' + Date.now())
+        fetch('https://yangkunta.github.io/QuickFind/version.json?t=' + Date.now())
             .then(res => res.json())
             .then(async (data) => {
                 if (data.version && data.version !== APP_VERSION) {
                     showToast(`發現新版本 ${data.version}，正在背景下載更新...`, 3000);
                     try {
                         const versionInfo = await Updater.download({
-                            url: 'https://qfmyp.netlify.app/update.zip',
+                            url: 'https://yangkunta.github.io/QuickFind/update.zip',
                             version: data.version
                         });
                         showToast("更新檔下載完成，即將為您重新啟動套用！", 3000);

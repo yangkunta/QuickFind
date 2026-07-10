@@ -23,6 +23,22 @@ jobs:
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
+      - name: Package OTA Update
+        run: |
+          cd www
+          zip -r ../update.zip .
+          cd ..
+          node -e "const pkg = require('./package.json'); require('fs').writeFileSync('version.json', JSON.stringify({ version: pkg.version }));"
+          mkdir -p ota_dist
+          mv update.zip ota_dist/
+          mv version.json ota_dist/
+
+      - name: Deploy OTA to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./ota_dist
+
       - name: Add Android Platform
         run: |
           # Only add if android folder does not exist
