@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    const APP_VERSION = '1.1.6';
+    const APP_VERSION = '1.1.7';
 
     // OTA Live Update Logic (Capgo)
     if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
@@ -689,33 +689,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Local Backup / Import Interactions ---
 
-    function handleLocalExport() {
+    async function handleLocalExport() {
         const encryptedPayload = localStorage.getItem('vaultone_db');
         if (!encryptedPayload) {
             showToast("沒有快取盒資料可以匯出");
             return;
         }
 
-        const blob = new Blob([encryptedPayload], { type: 'application/json' });
         const fileName = `vaultone_backup_${new Date().toISOString().slice(0,10)}.json`;
         
-        if (navigator.canShare) {
-            const file = new File([blob], fileName, { type: 'application/json' });
-            if (navigator.canShare({ files: [file] })) {
-                navigator.share({
-                    files: [file],
-                    title: 'QuickFind 備份',
-                    text: '這是我從 QuickFind 匯出的加密備份檔'
-                }).then(() => {
-                    showToast("匯出分享成功");
-                }).catch(e => {
-                    console.error(e);
-                    showToast("匯出分享已取消或失敗");
+        // 1. Capacitor Native Share (Filesystem + Share)
+        if (window.Capacitor && Capacitor.Plugins.Filesystem && Capacitor.Plugins.Share) {
+            try {
+                const { Filesystem, Share } = Capacitor.Plugins;
+                const result = await Filesystem.writeFile({
+                    path: fileName,
+                    data: encryptedPayload,
+                    directory: 'CACHE',
+                    encoding: 'utf8'
                 });
+                await Share.share({
+                    title: 'QuickFind 備份',
+                    text: '這是我從 QuickFind 匯出的加密備份檔',
+                    url: result.uri,
+                    dialogTitle: '儲存或分享備份'
+                });
+                showToast("匯出分享成功");
                 return;
+            } catch(e) {
+                console.error("Capacitor Export failed:", e);
+                // Continue to fallback
             }
         }
 
+        // 2. Web Share API Fallback
+        const blob = new Blob([encryptedPayload], { type: 'application/json' });
+        
+        if (navigator.canShare) {
+            try {
+                const file = new File([blob], fileName, { type: 'application/json' });
+                if (navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'QuickFind 備份',
+                        text: '這是我從 QuickFind 匯出的加密備份檔'
+                    });
+                    showToast("匯出分享成功");
+                    return;
+                }
+            } catch(e) {
+                console.error("Web Share failed:", e);
+            }
+        }
+
+        // 3. Desktop Browser Fallback
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -874,13 +901,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 await saveVaultToStorage(masterPassword);
-                showToast(`成功匯入 ${selectedData.length} 筆資料！`);
+                const msg = `成功匯入 ${selectedData.length} 筆資料！`;
+                showToast(msg);
+                alert(msg); // 確保使用者一定能看到成功訊息
                 closeBottomSheet(csvPreviewOverlay, csvPreviewSheet);
                 if (pageTitle.innerText === "查詢" || pageTitle.innerText === "維護") {
                     renderRecords(searchInput.value);
                 }
             } catch (e) {
                 showToast("儲存失敗！");
+                alert("儲存失敗！");
             }
         };
     }
