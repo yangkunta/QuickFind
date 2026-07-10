@@ -49,7 +49,8 @@ body {
 .app-container {
     width: 100%;
     max-width: 480px;
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
     background-color: var(--bg-secondary);
     display: flex;
     flex-direction: column;
@@ -73,10 +74,11 @@ h1, h2, h3, h4 {
 }
 
 .oneui-header .title {
-    font-size: 34px;
+    font-size: 20px;
     font-weight: 700;
     letter-spacing: -0.5px;
     color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .oneui-header .subtitle {

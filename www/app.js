@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    const APP_VERSION = '1.1.7';
+    const APP_VERSION = '1.1.8';
 
     // OTA Live Update Logic (Capgo)
     if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
@@ -1084,8 +1084,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (tabName === 'settings') {
             tabSettings.classList.add('active');
             mainSettingsView.style.display = 'flex';
-            pageTitle.innerText = "設定";
-            pageTitle.style.color = "#AF52DE";
+            document.getElementById('settings-page-title').style.color = "#AF52DE";
             updateGoogleDriveUI();
         }
     }
