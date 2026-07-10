@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    const APP_VERSION = '1.1.12';
+    const APP_VERSION = '1.1.13';
 
     // OTA Live Update Logic (Capgo)
     if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
@@ -640,27 +640,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const fileName = `vaultone_backup_${new Date().toISOString().slice(0,10)}.json`;
         
-        // 1. Capacitor Native Share (Filesystem + Share)
-        if (window.Capacitor && Capacitor.Plugins.Filesystem && Capacitor.Plugins.Share) {
+        // 1. Capacitor Native Filesystem
+        if (window.Capacitor && Capacitor.Plugins.Filesystem) {
             try {
-                const { Filesystem, Share } = Capacitor.Plugins;
-                const result = await Filesystem.writeFile({
+                const { Filesystem } = Capacitor.Plugins;
+                await Filesystem.writeFile({
                     path: fileName,
                     data: encryptedPayload,
-                    directory: 'CACHE',
+                    directory: 'DOCUMENTS',
                     encoding: 'utf8'
                 });
-                await Share.share({
-                    title: 'QuickFind 備份',
-                    text: '這是我從 QuickFind 匯出的加密備份檔',
-                    url: result.uri,
-                    dialogTitle: '儲存或分享備份'
-                });
-                showToast("匯出分享成功");
+                showToast("✅ 匯出成功！檔案已儲存至手機的 Documents (文件) 資料夾。");
                 return;
             } catch(e) {
                 console.error("Capacitor Export failed:", e);
-                // Continue to fallback
+                // 嘗試寫入 Documents 失敗，退回分享模式
+                if (Capacitor.Plugins.Share) {
+                    try {
+                        const { Filesystem, Share } = Capacitor.Plugins;
+                        const result = await Filesystem.writeFile({
+                            path: fileName,
+                            data: encryptedPayload,
+                            directory: 'CACHE',
+                            encoding: 'utf8'
+                        });
+                        await Share.share({
+                            title: 'QuickFind 備份',
+                            text: '請選擇「儲存到裝置」或檔案管理員來存放備份檔',
+                            url: result.uri,
+                            dialogTitle: '選擇儲存位置'
+                        });
+                        return;
+                    } catch(err) {}
+                }
             }
         }
 
