@@ -47,13 +47,13 @@
             </div>
 
             <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
-                QuickFind v1.1.8<br>
+                QuickFind v1.1.9<br>
                 本地端加密 • 零知識架構
             </div>
         </div>
 
         <!-- 2. Main App Content (Vault View) -->
-        <div id="main-vault-view" style="display: flex; flex-direction: column; flex: 1;">
+        <div id="main-vault-view" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;">
             
             <!-- Collapsible Header -->
             <div class="oneui-header">
@@ -88,7 +88,7 @@
         </div>
 
         <!-- 3. Settings View (Hidden by default) -->
-        <div id="main-settings-view" style="display: none; flex-direction: column; flex: 1;">
+        <div id="main-settings-view" style="display: none; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;">
             <div class="oneui-header">
                 <span class="subtitle">系統設定與同步</span>
                 <span class="title" id="settings-page-title">設定</span>
@@ -100,6 +100,17 @@
                 <div class="card-group" style="padding: 8px 0;">
                     <!-- Google Cloud Credentials -->
                     <div style="padding: 12px 20px;">
+                        <div class="sync-instructions" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                            <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--accent-blue);">如何設定 Google Drive 同步？</h4>
+                            <ol style="margin: 0; padding-left: 20px; font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                                <li>前往 <a href="https://console.cloud.google.com/" target="_blank" style="color: var(--accent-blue); text-decoration: none;">Google Cloud Console</a> 建立專案。</li>
+                                <li>在「API 和服務」中啟用 <b>Google Drive API</b>。</li>
+                                <li>設定「OAuth 同意畫面」(User Type 選外部，並加入您的 Google 帳號為測試人員)。</li>
+                                <li>建立憑證 (選擇 <b>網頁應用程式</b>)。</li>
+                                <li>將 <b>已授權的 JavaScript 來源</b> 設定為 <code>https://yangkunta.github.io</code>。</li>
+                                <li>將取得的 Client ID 貼到下方欄位並儲存。</li>
+                            </ol>
+                        </div>
                         <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Google Cloud OAuth Client ID (留空使用模擬沙盒測試)</label>
                         <div class="input-container">
                             <input type="text" id="setting-client-id" placeholder="輸入您的 Client ID..." style="background-color: var(--bg-primary); padding: 10px 12px; font-size: 13px;">
@@ -218,7 +229,7 @@
                 </div>
                 
                 <div style="text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 24px;">
-                    QuickFind v1.1.8<br>
+                    QuickFind v1.1.9<br>
                     本地端加密 • 零知識架構
                 </div>
             </div>

@@ -1,6 +1,6 @@
 {
   "name": "mymem",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "QuickFind 是一個極致簡化、高安全性的本地端私密筆記與密碼管理器 (Progressive Web App, PWA)。 這個專案專注於提供**最快、最安全的查詢與維護體驗**，完全在本地端加密，確保資料零外洩。",
   "main": "index.js",
   "scripts": {
