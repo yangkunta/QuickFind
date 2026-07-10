@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    const APP_VERSION = '1.1.11';
+    const APP_VERSION = '1.1.12';
 
     // OTA Live Update Logic (Capgo)
     if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
