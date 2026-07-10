@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    const APP_VERSION = '1.1.14';
+    const APP_VERSION = '1.1.15';
 
     // OTA Live Update Logic (Capgo)
     if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
             item.innerHTML = `
                 <div class="item-left" style="align-items: flex-start; max-width: calc(100% - 40px);">
                     <div class="item-details" style="display: flex; flex-direction: column; gap: 2px; width: 100%;">
-                        <div class="item-title" style="white-space: pre-wrap; word-break: break-all; -webkit-line-clamp: 4; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">${escapeHTML(mainTitle)}</div>
+                        <div class="item-title" style="white-space: pre-wrap; word-break: break-all; -webkit-line-clamp: 4; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;"><span class="category-tag">${escapeHTML(rec.category || '未分類')}</span>${escapeHTML(mainTitle)}</div>
                     </div>
                 </div>
                 <div class="item-right" onclick="event.stopPropagation();" style="display: flex; flex-direction: ${isMaintMode ? 'column' : 'row'}; gap: 8px;">
