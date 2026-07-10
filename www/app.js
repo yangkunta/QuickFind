@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
-    const APP_VERSION = '1.1.2';
+    const APP_VERSION = '1.1.3';
 
     // OTA Live Update Logic (Capgo)
     if (window.Capacitor && Capacitor.Plugins.CapacitorUpdater) {
@@ -100,8 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let vaultRecords = [];
     let masterPassword = ''; // In-memory cache while app is unlocked
     let currentRecordForDetail = null;
-    let autoLockTimer = null;
-    const AUTO_LOCK_TIMEOUT = 60000; // 60 seconds of inactivity
+
     let isShowingAll = false; // Controls default empty state
     let csvPreviewData = []; // Holds CSV data during preview
 
@@ -278,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Unlock transition animation
     function unlockApp() {
         lockScreen.classList.add('unlock-anim');
-        resetAutoLockTimer();
+        // Auto-lock removed
         renderRecords();
         updateGoogleDriveUI();
     }
@@ -292,31 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-
-    // --- Auto-Lock Mechanism ---
-
-    function resetAutoLockTimer() {
-        if (autoLockTimer) clearTimeout(autoLockTimer);
-        // Only trigger auto lock if we are actually unlocked (lock screen hidden)
-        if (lockScreen.classList.contains('unlock-anim')) {
-            autoLockTimer = setTimeout(() => {
-                lockApp();
-                showToast("閒置逾時，快取盒已鎖定");
-            }, AUTO_LOCK_TIMEOUT);
-        }
-    }
-
-    // Reset timer on user activity
-    ['click', 'touchstart', 'scroll', 'keypress'].forEach(evt => {
-        window.addEventListener(evt, resetAutoLockTimer);
-    });
-
-    // Background lock: lock app instantly when user switches apps or minimizes
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') {
-            lockApp();
-        }
-    });
+    // --- Auto-Lock Mechanism Removed ---
 
     // --- Vault Database Storage ---
 
@@ -486,14 +461,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function openBottomSheet(overlay, sheet) {
         overlay.classList.add('active');
         sheet.classList.add('active');
-        resetAutoLockTimer();
+        // Auto-lock removed
     }
 
     // Close Bottom Sheet helper
     function closeBottomSheet(overlay, sheet) {
         overlay.classList.remove('active');
         sheet.classList.remove('active');
-        resetAutoLockTimer();
+        // Auto-lock removed
     }
 
     // Open Add / Edit sheet
